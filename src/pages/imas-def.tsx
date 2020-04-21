@@ -81,7 +81,6 @@ const ImasDef: React.FC = () => {
             inputProps={{
               ref: tagsInputRef,
               placeholder: '캐릭터 이름을 엔터로 입력하세요.',
-              autoFocus: true,
             }}
           />
         </Form.Group>
