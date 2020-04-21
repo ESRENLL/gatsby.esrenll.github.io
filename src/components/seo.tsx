@@ -11,11 +11,10 @@ import { useStaticQuery, graphql } from 'gatsby'
 
 interface Props {
   title: string
-  image?: string
   lang?: string
 }
 
-const SEO: React.FC<Props> = ({ title, image = '/', lang = 'ko' }) => {
+const SEO: React.FC<Props> = ({ title, lang = 'ko' }) => {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -54,10 +53,6 @@ const SEO: React.FC<Props> = ({ title, image = '/', lang = 'ko' }) => {
         {
           property: `og:type`,
           content: `website`,
-        },
-        {
-          property: `og:image`,
-          content: image,
         },
       ]}
     />
