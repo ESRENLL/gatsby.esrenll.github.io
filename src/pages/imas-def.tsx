@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Form, Table } from 'react-bootstrap'
 import TagsInput from 'react-tagsinput'
 
@@ -17,31 +17,40 @@ interface DataUnit {
 }
 
 interface ScoredDataUnit extends DataUnit {
-  score: number
+  mismatchCount: number
 }
 
 const ImasDef: React.FC = () => {
-  const [listOpt, setListOpt] = useState<string>('all')
+  const [listOpt, setListOpt] = useState('recommand')
   const [chars, setChars] = useState<string[]>([])
+  const tagsInputRef = useRef<HTMLInputElement>()
+
+  useEffect(() => {
+    tagsInputRef.current?.focus() // autoFocus 시 style이 적용되지 않음
+  }, [tagsInputRef])
 
   const showData = useMemo<ScoredDataUnit[]>(() => {
     if (chars.length === 0) return data
 
     const scored = (data as DataUnit[]).map(dataUnit => {
-      const score = dataUnit.chars.filter(dataChar =>
-        chars.some(char => dataChar.includes(char))
-      ).length
+      const mismatchCount =
+        dataUnit.chars.length -
+        dataUnit.chars.filter(dataChar =>
+          chars.some(char => dataChar.includes(char))
+        ).length
+
       return {
         ...dataUnit,
-        score,
+        mismatchCount,
       } as ScoredDataUnit
     })
-    const filtered = scored.filter(dataUnit => dataUnit.score > 0)
 
     if (listOpt === 'all') {
-      return filtered
+      return scored
     } else {
-      return filtered.slice(0, 100)
+      return scored.filter(
+        dataUnit => dataUnit.chars.length !== dataUnit.mismatchCount
+      )
     }
   }, [listOpt, chars])
 
@@ -60,7 +69,7 @@ const ImasDef: React.FC = () => {
             <option value="all">전체</option>
           </Form.Control>
           <Form.Text className="text-muted">
-            추천은 일부 목록만 표시합니다. (미구현)
+            추천은 일치하는 목록만 표시합니다.
           </Form.Text>
         </Form.Group>
         <Form.Group>
@@ -70,6 +79,7 @@ const ImasDef: React.FC = () => {
             onChange={setChars}
             focusedClassName="tagsInputFocus"
             inputProps={{
+              ref: tagsInputRef,
               placeholder: '캐릭터 이름을 엔터로 입력하세요.',
               autoFocus: true,
             }}
@@ -92,7 +102,8 @@ const ImasDef: React.FC = () => {
               {showData
                 .sort(
                   (d1, d2) =>
-                    (d2.score - d1.score) * 100000 + (d2.income - d1.income)
+                    (d1.mismatchCount - d2.mismatchCount) * 100000 +
+                    (d2.income - d1.income)
                 )
                 .map(({ id, chars: showChars, income }) => (
                   <tr key={id}>
