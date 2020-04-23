@@ -30,8 +30,6 @@ const ImasDef: React.FC = () => {
   }, [tagsInputRef])
 
   const showData = useMemo<ScoredDataUnit[]>(() => {
-    if (chars.length === 0) return data
-
     const scored = (data as DataUnit[]).map(dataUnit => {
       const mismatchCount =
         dataUnit.chars.length -
