@@ -35,7 +35,7 @@
   "license": "MIT",
   "scripts": {
     "build": "gatsby build --prefix-paths",
-    "deploy": "rm -rf ../gatsby && cp ./public ../gatsby",
+    "deploy": "rm -rf ../gatsby && cp -r ./public ../gatsby",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "npm run develop",
